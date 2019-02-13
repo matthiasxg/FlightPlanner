@@ -87,7 +87,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="rightLayout" stretch="360,140">
+       <layout class="QVBoxLayout" name="rightLayout" stretch="360,0">
         <item>
          <widget class="QLabel" name="map">
           <property name="minimumSize">
@@ -114,7 +114,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QTableView" name="flightTable">
+         <widget class="QTableWidget" name="flightTable">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -133,6 +133,51 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="sortingEnabled">
+           <bool>false</bool>
+          </property>
+          <property name="rowCount">
+           <number>7</number>
+          </property>
+          <property name="columnCount">
+           <number>4</number>
+          </property>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>176</number>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <row/>
+          <row/>
+          <row/>
+          <row/>
+          <row/>
+          <row/>
+          <row/>
+          <column>
+           <property name="text">
+            <string>From</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>To</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Airline</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Alliance</string>
+           </property>
+          </column>
          </widget>
         </item>
        </layout>

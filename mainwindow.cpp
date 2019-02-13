@@ -7,6 +7,21 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     initComboBoxen();
+
+    /* How to insert in table
+    vector<vector<QTableWidgetItem*>> z;
+    vector<QTableWidgetItem*> v;
+
+    for (int i{0}; i < 100; i++){
+        v.clear();
+        for (int j = 0; j < 4; j++) {
+            v.push_back(new QTableWidgetItem(tr("%1").arg(i+j)));
+        }
+        z.push_back(v);
+    }
+
+    fillTable(z);
+    */
 }
 
 void MainWindow::initComboBoxen() {
@@ -35,6 +50,17 @@ void MainWindow::initComboBoxen() {
     ui->searchButton->setFont(standardFont);
 }
 
+void MainWindow::fillTable(std::vector<vector<QTableWidgetItem*>> table){
+    ui->flightTable->setRowCount(table.size());
+    for (int i{0}; i < table.size(); i++) {
+        for (int j{0}; j < table.at(i).size(); j++) {
+            ui->flightTable->setItem(i, j, table.at(i).at(j));
+        }
+    }
+
+    ui->flightTable->show();
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -42,5 +68,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_searchButton_clicked()
 {
-    // Button clicked
+    QString departure = ui->comboDeparture->currentText();
+    QString destination = ui->comboDestination->currentText();
+    QString airline = ui->comboAirline->currentText();
+
+
 }
