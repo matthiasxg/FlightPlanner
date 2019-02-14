@@ -18,7 +18,7 @@ std::vector<QString> DbManager::getAllAirlineNames() {
     std::vector<QString> result;
 
     while (query.next()) {
-        result.push_back(query.value(nameAirline).toString().trimmed());
+        result.push_back(query.value(nameAirline).toString());
     }
 
     return result;
@@ -30,7 +30,72 @@ std::vector<QString> DbManager::getAllAirportNames() {
     std::vector<QString> result;
 
     while (query.next()) {
-        result.push_back(query.value(nameAirline).toString().trimmed());
+        result.push_back(query.value(nameAirline).toString());
+    }
+
+    return result;
+}
+
+void DbManager::fillGraph(Graph& graph) {
+    QSqlQuery query{"select airport1, airport2 from route"};
+
+    auto airport1 = query.record().indexOf("airport1");
+    auto airport2 = query.record().indexOf("airport2");
+
+    while(query.next()){
+        graph.addKante(
+                       query.value(airport1).toInt(),
+                       query.value(airport2).toInt()
+                      );
+    }
+}
+
+int DbManager::getAirportId(QString name) {
+    QSqlQuery query("select * from Airport");
+    int idAirline = query.record().indexOf("id");
+    auto nameAriline = query.record().indexOf("name");
+
+
+    int result{-1};
+
+    while (query.next()) {
+        if (query.value(nameAriline).toString() == name) {
+            result = query.value(idAirline).toInt();
+        }
+
+    }
+
+    return result;
+}
+
+bool DbManager::hasARoute(QString name) {
+    bool result{false};
+    QSqlQuery query{"select airport1, airport2 from route"};
+
+    auto airport1 = query.record().indexOf("airport1");
+    auto airport2 = query.record().indexOf("airport2");
+
+    while(query.next()){
+        if (getAirportName(query.value(airport1).toInt()) == name ||
+                getAirportName(query.value(airport2).toInt()) == name) {
+            result = true;
+        }
+    }
+    return result;
+}
+
+QString DbManager::getAirportName(int id){
+    QSqlQuery query("select * from Airport");
+    int idAirline = query.record().indexOf("id");
+    auto nameAriline = query.record().indexOf("name");
+
+
+    QString result{""};
+
+    while (query.next()) {
+        if (query.value(idAirline).toInt() == id) {
+            result = query.value(nameAriline).toString();
+        }
     }
 
     return result;

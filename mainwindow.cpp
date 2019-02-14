@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     initComboBoxen();
 
+    database.fillGraph(gr);
+
     /* How to insert in table
     vector<vector<QTableWidgetItem*>> z;
     vector<QTableWidgetItem*> v;
@@ -72,5 +74,14 @@ void MainWindow::on_searchButton_clicked()
     QString destination = ui->comboDestination->currentText();
     QString airline = ui->comboAirline->currentText();
 
+    int airport1 = database.getAirportId(departure);
+    int airport2 = database.getAirportId(destination);
+
+    if (airport1 != airport2 && database.hasARoute(departure) && database.hasARoute(destination)) {
+        auto result = gr.calculate(airport1, airport2);
+    } else {
+        qDebug() << "not found";
+    }
 
 }
+

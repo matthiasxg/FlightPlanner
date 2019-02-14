@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QFont>
 #include "dbmanager.h"
+#include "graph.h"
 #include <QMessageBox>
 #include <vector>
 #include <QTableWidgetItem>
@@ -33,6 +34,8 @@ private:
     DbManager database{"../static/AirlineRoutes.db"}; // Path to database file
     std::vector<QString> allAirlineNames;
     std::vector<QString> allAirportNames;
+
+    Graph gr;
 
     QFont titleFont{"Helvetica", 18, QFont::Bold};
     QFont standardFont{"Helvetica", 18};
