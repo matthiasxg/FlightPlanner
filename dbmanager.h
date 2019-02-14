@@ -18,7 +18,7 @@ public:
     std::vector<int> getDestinationAirports(int id);
     void fillGraph(Graph& graph);
     int getAirportId(QString name);
-    bool hasARoute(QString name);
+    bool hasARoute(int name);
     QString getAirportName(int id);
 private:
     QSqlDatabase m_db;

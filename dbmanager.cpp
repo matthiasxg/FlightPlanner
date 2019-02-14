@@ -68,7 +68,7 @@ int DbManager::getAirportId(QString name) {
     return result;
 }
 
-bool DbManager::hasARoute(QString name) {
+bool DbManager::hasARoute(int id) {
     bool result{false};
     QSqlQuery query{"select airport1, airport2 from route"};
 
@@ -76,8 +76,8 @@ bool DbManager::hasARoute(QString name) {
     auto airport2 = query.record().indexOf("airport2");
 
     while(query.next()){
-        if (getAirportName(query.value(airport1).toInt()) == name ||
-                getAirportName(query.value(airport2).toInt()) == name) {
+        if (query.value(airport1).toInt() == id ||
+                query.value(airport2).toInt() == id) {
             result = true;
         }
     }

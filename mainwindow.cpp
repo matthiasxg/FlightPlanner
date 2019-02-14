@@ -77,7 +77,7 @@ void MainWindow::on_searchButton_clicked()
     int airport1 = database.getAirportId(departure);
     int airport2 = database.getAirportId(destination);
 
-    if (airport1 != airport2 && database.hasARoute(departure) && database.hasARoute(destination)) {
+    if (airport1 != airport2 && database.hasARoute(airport1) && database.hasARoute(airport2)) {
         auto result = gr.calculate(airport1, airport2);
     } else {
         qDebug() << "not found";
