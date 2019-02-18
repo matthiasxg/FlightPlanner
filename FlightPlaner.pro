@@ -28,13 +28,15 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    dbmanager.cpp \
-    graph.cpp
+    drawablemapwidget.cpp
 
 HEADERS += \
         mainwindow.h \
     dbmanager.h \
-    graph.h
+    route.h \
+    drawablemapwidget.h \
+    airport.h \
+    airline.h
 
 FORMS += \
         mainwindow.ui
@@ -46,3 +48,24 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    static/AirlineRoutes.db \
+    static/Earthmap.jpg \
+    static/Latitude and Longitude of the Earth.png
+
+# remove possible other optimization flags
+QMAKE_CXXFLAGS_RELEASE -= -O
+QMAKE_CXXFLAGS_RELEASE -= -O1
+QMAKE_CXXFLAGS_RELEASE -= -O2
+
+# add the desired if not present
+QMAKE_CXXFLAGS_RELEASE *= -O2
+
+# Copy DB File to executable
+
+copydata.commands = $(COPY_DIR) $$PWD/static/AirlineRoutes.db $$OUT_PWD
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata

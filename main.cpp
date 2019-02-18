@@ -1,3 +1,10 @@
+/*
+ * Author: Matthias Grill
+ * Class: 5BHIF
+ * Date: 18.02.2019
+ */
+
+
 #include "mainwindow.h"
 #include <QApplication>
 
