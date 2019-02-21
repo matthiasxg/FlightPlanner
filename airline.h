@@ -1,9 +1,7 @@
 /*
- * Author: Matthias Grill
+ * Name: Grill Matthias
  * Class: 5BHIF
- * Date: 18.02.2019
  */
-
 #ifndef AIRLINE_H
 #define AIRLINE_H
 

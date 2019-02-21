@@ -1,10 +1,7 @@
 /*
- * Author: Matthias Grill
+ * Name: Grill Matthias
  * Class: 5BHIF
- * Date: 18.02.2019
  */
-
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -15,6 +12,7 @@
 #include <vector>
 #include <QTableWidgetItem>
 #include <memory>
+#include "addroutedialog.h"
 
 using namespace std;
 
@@ -29,20 +27,24 @@ class MainWindow : public QMainWindow
 
 public:
   explicit MainWindow(QWidget *parent = nullptr);
-  void init();
+  void initGUI();
   ~MainWindow();
 
 private slots:
   void on_pushButton_clicked();
 
+  void on_actionAdd_route_triggered();
+
   void on_actionAbout_me_triggered();
 
 private:
   Ui::MainWindow *ui;
+  AddRouteDialog addRouteDialog;
   DbManager database = DbManager::getInstance();
 
-  vector<vector<int>> getRoutes(vector<int> prev, int depth, int start, int end);
-  vector<vector<int>> removeWrongAirlines(vector<vector<int>> routes, int airline);
+  QFont font{"Helvetica", 16, QFont::Bold};
+
+  void fillFlightTable(vector<vector<int>> routes);
   std::tuple<vector<tuple<int, int>>, vector<tuple<int, int>>, vector<tuple<int, int>>> splitRoutes(vector<vector<int>> routes, int airline);
 };
 

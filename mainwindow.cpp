@@ -1,36 +1,35 @@
 /*
- * Author: Matthias Grill
+ * Name: Grill Matthias
  * Class: 5BHIF
- * Date: 18.02.2019
  */
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <vector>
 #include <future>
 #include <QCompleter>
 #include <chrono>
+#include "customsearchalgorithm.h"
+#include "breadthfirstsearchalgorithm.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    init();
+    initGUI();
 }
 
-void MainWindow::init()
+void MainWindow::initGUI()
 {
-    //Fonts
-    QFont font("Helvetica", 14, QFont::Bold);
+    //Set Fonts
     ui->toLabel->setFont(font);
     ui->fromLabel->setFont(font);
     ui->airlineLabel->setFont(font);
     ui->pushButton->setFont(font);
 
-    //Status Bar
+    //Status bar
     ui->statusBar->showMessage("Matthias Grill x 5BHIF");
 
-    // Fill airport forms
+    //Fill airports
     QStringList airportList;
     for (auto &airport : database.airports)
     {
@@ -41,7 +40,7 @@ void MainWindow::init()
     ui->FromSearch->setCompleter(aiportCompleter);
     ui->ToSearch->setCompleter(aiportCompleter);
 
-    // Fill airline forms
+    //Fill Airlines
     QStringList airlineList;
     for (auto &airline : database.airlines)
     {
@@ -52,86 +51,13 @@ void MainWindow::init()
     ui->AirlineSearch->setCompleter(airlineCompleter);
 }
 
-vector<vector<int>> MainWindow::getRoutes(vector<int> prev, int depth, int start, int end)
+MainWindow::~MainWindow()
 {
-    vector<vector<int>> ret;
-
-    if (depth == 0)
-    {
-        if (database.isConnected(start, end))
-        {
-            vector<int> newPrev = prev;
-            newPrev.push_back(end);
-            ret.push_back(newPrev);
-        }
-    }
-    else
-    {
-        auto nbs = database.getNeighbours(start);
-        vector<future<vector<vector<int>>>> futs;
-
-        for (auto &airport : nbs)
-        {
-            if (std::find(prev.begin(), prev.end(), airport) != prev.end())
-            {
-                continue;
-            }
-
-            vector<int> newPrev = prev;
-            newPrev.push_back(airport);
-
-            if (depth == 4)
-            {
-                futs.push_back(std::async(launch::async, &MainWindow::getRoutes, this, newPrev, depth - 1, airport, end));
-            }
-            else
-            {
-                auto toConcat = getRoutes(newPrev, depth - 1, airport, end);
-                if (toConcat.size() != 0)
-                {
-                    ret.insert(ret.end(), toConcat.begin(), toConcat.end());
-                }
-            }
-        }
-
-        for (auto &fut : futs)
-        {
-            auto toConcat = fut.get();
-            ret.insert(ret.end(), toConcat.begin(), toConcat.end());
-        }
-    }
-    return ret;
+    delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::fillFlightTable(vector<vector<int>> routes)
 {
-    ui->flighttable->clear();
-    ui->map->resetPic();
-
-    QString departure = ui->FromSearch->text();
-    QString destination = ui->ToSearch->text();
-    QString airline = ui->AirlineSearch->text();
-
-    departure = departure.left(departure.indexOf("(") - 1);
-    destination = destination.left(destination.indexOf("(") - 1);
-
-    int airport1 = database.getAirportId(departure);
-    int airport2 = database.getAirportId(destination);
-    int airlineId = database.getAirlineId(airline);
-
-    //airport1 = 4908; // Vienna
-    //airport2 = 3699; // Palm Spings
-
-    int depth{0};
-    vector<vector<int>> routes;
-    do
-    {
-        routes = getRoutes({airport1}, depth, airport1, airport2);
-        qDebug() << "Depth: " << depth;
-        depth += 1;
-    } while (routes.size() == 0 && depth <= 4);
-
-    // Fill flight table
     vector<QString> flights;
     for (auto &vec : routes)
     {
@@ -148,13 +74,45 @@ void MainWindow::on_pushButton_clicked()
         flights.push_back(flight);
     }
     sort(flights.begin(), flights.end());
-
     for (auto &flight : flights)
     {
         ui->flighttable->addItem(new QListWidgetItem(flight));
     }
+}
 
-    // Split all routes to the different colours
+void MainWindow::on_pushButton_clicked()
+{
+    ui->flighttable->clear();
+    ui->map->resetPic();
+
+    QString departure = ui->FromSearch->text().simplified();
+    QString destination = ui->ToSearch->text().simplified();
+    QString airline = ui->AirlineSearch->text().simplified();
+
+    departure = departure.left(departure.indexOf("(") - 1);
+    destination = destination.left(destination.indexOf("(") - 1);
+
+    int airport1 = database.getAirportId(departure);
+    int airport2 = database.getAirportId(destination);
+    int airlineId = database.getAirlineId(airline);
+
+    if (airport1 == 0 || airport2 == 0)
+    {
+        qDebug() << "Using debug mode";
+        airport1 = 4908; // Vienna
+        airport2 = 3699; // Palm Spings
+    }
+
+    BreadthFirstSearchAlgorithm searchAlgorithm;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    vector<vector<int>> routes = searchAlgorithm.getRoutes(airport1, airport2);
+    auto finish = std::chrono::high_resolution_clock::now();
+    auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(finish - start);
+
+    qDebug() << "TIME: " << microseconds.count() * 0.001;
+    fillFlightTable(routes);
+
     auto newRoutes = splitRoutes(routes, airlineId);
     if (airlineId == -1)
     {
@@ -198,17 +156,14 @@ std::tuple<vector<tuple<int, int>>, vector<tuple<int, int>>, vector<tuple<int, i
     return std::make_tuple(airlineRoutes, allianceRoutes, otherRoutes);
 }
 
-void MainWindow::on_actionAbout_me_triggered()
+void MainWindow::on_actionAdd_route_triggered()
 {
-    QMessageBox msg;
-    msg.setText("<center>Name: Matthias Grill<br>"
-                "Class: 5BHIF<br>"
-                "Made with love & coffee hihi</center>");
-    msg.exec();
+    addRouteDialog.show();
 }
 
-
-MainWindow::~MainWindow()
+void MainWindow::on_actionAbout_me_triggered()
 {
-    delete ui;
+    QMessageBox qMessageBox;
+    qMessageBox.setText("");
+    qMessageBox.exec();
 }

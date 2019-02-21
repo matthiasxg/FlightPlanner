@@ -1,10 +1,7 @@
 /*
- * Author: Matthias Grill
+ * Name: Grill Matthias
  * Class: 5BHIF
- * Date: 18.02.2019
  */
-
-
 #ifndef DBMANAGER_H
 #define DBMANAGER_H
 
@@ -130,6 +127,17 @@ class DbManager
         results.assign(set.begin(), set.end());
 
         return results;
+    }
+
+    void addRoute(int startAirport, int endAirport, int airline)
+    {
+        routes[startAirport].push_back(Route(startAirport, endAirport, airline));
+        connections[startAirport][endAirport] = true;
+
+        //QSqlQuery query;
+        //query.prepare("insert into routes values (?, ?, ?)");
+        //query.bindValue(startAirport, endAirport, airline);
+        //query.exec();
     }
 
   private:

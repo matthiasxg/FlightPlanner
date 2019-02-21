@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2019-01-28T11:10:45
+# Project created by QtCreator 2019-05-28T11:20:30
 #
 #-------------------------------------------------
 
@@ -28,7 +28,8 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    drawablemapwidget.cpp
+    drawablemapwidget.cpp \
+    addroutedialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -36,10 +37,16 @@ HEADERS += \
     route.h \
     drawablemapwidget.h \
     airport.h \
-    airline.h
+    airline.h \
+    searchalgorithm.h \
+    customsearchalgorithm.h \
+    dijkstrasearchalgorithm.h \
+    breadthfirstsearchalgorithm.h \
+    addroutedialog.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    addroutedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
