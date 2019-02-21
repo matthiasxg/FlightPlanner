@@ -15,11 +15,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    initGUI();
+    init();
 }
 
-void MainWindow::initGUI()
+void MainWindow::init()
 {
+    //Fonts
+    QFont font("Helvetica", 14, QFont::Bold);
+    ui->toLabel->setFont(font);
+    ui->fromLabel->setFont(font);
+    ui->airlineLabel->setFont(font);
+    ui->pushButton->setFont(font);
+
+    //Status Bar
+    ui->statusBar->showMessage("Matthias Grill x 5BHIF");
+
+    // Fill airport forms
     QStringList airportList;
     for (auto &airport : database.airports)
     {
@@ -30,7 +41,7 @@ void MainWindow::initGUI()
     ui->FromSearch->setCompleter(aiportCompleter);
     ui->ToSearch->setCompleter(aiportCompleter);
 
-    // Airlines
+    // Fill airline forms
     QStringList airlineList;
     for (auto &airline : database.airlines)
     {
@@ -39,11 +50,6 @@ void MainWindow::initGUI()
     QCompleter *airlineCompleter = new QCompleter(airlineList, this);
     airlineCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     ui->AirlineSearch->setCompleter(airlineCompleter);
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
 }
 
 vector<vector<int>> MainWindow::getRoutes(vector<int> prev, int depth, int start, int end)
@@ -120,18 +126,12 @@ void MainWindow::on_pushButton_clicked()
     vector<vector<int>> routes;
     do
     {
-        auto start = std::chrono::high_resolution_clock::now();
         routes = getRoutes({airport1}, depth, airport1, airport2);
-        auto finish = std::chrono::high_resolution_clock::now();
-        auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(finish - start);
-
-        qDebug() << depth;
-        qDebug() << microseconds.count() * 0.001;
+        qDebug() << "Depth: " << depth;
         depth += 1;
     } while (routes.size() == 0 && depth <= 4);
 
     // Fill flight table
-
     vector<QString> flights;
     for (auto &vec : routes)
     {
@@ -148,13 +148,13 @@ void MainWindow::on_pushButton_clicked()
         flights.push_back(flight);
     }
     sort(flights.begin(), flights.end());
+
     for (auto &flight : flights)
     {
         ui->flighttable->addItem(new QListWidgetItem(flight));
     }
 
-
-
+    // Split all routes to the different colours
     auto newRoutes = splitRoutes(routes, airlineId);
     if (airlineId == -1)
     {
@@ -196,4 +196,19 @@ std::tuple<vector<tuple<int, int>>, vector<tuple<int, int>>, vector<tuple<int, i
     }
 
     return std::make_tuple(airlineRoutes, allianceRoutes, otherRoutes);
+}
+
+void MainWindow::on_actionAbout_me_triggered()
+{
+    QMessageBox msg;
+    msg.setText("<center>Name: Matthias Grill<br>"
+                "Class: 5BHIF<br>"
+                "Made with love & coffee hihi</center>");
+    msg.exec();
+}
+
+
+MainWindow::~MainWindow()
+{
+    delete ui;
 }

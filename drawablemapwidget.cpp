@@ -3,15 +3,10 @@
  * Class: 5BHIF
  * Date: 18.02.2019
  */
-
-
 #include "drawablemapwidget.h"
-
 #include "mainwindow.h"
 #include <algorithm>
-
 #include <cmath>
-
 #include <QStringList>
 #include <QPainter>
 #include <QApplication>
@@ -27,6 +22,7 @@ void DrawableMapWidget::paintEvent(QPaintEvent *)
     painter.drawPixmap(0, 0, pic);
 }
 
+// Returns point in map of airport
 QPoint DrawableMapWidget::airportToImg(Airport airport)
 {
     return latLonToPoint(airport.latitude, airport.longitude);
@@ -45,15 +41,14 @@ void DrawableMapWidget::connectAirports(Airport from, Airport to, QColor color, 
     auto directDistance = abs(from.longitude - to.longitude);
     auto roundDistance = 360 - directDistance;
 
+    painter.setPen(QPen{QBrush{color}, 1});
+
     if (directDistance < roundDistance)
     {
-        painter.setPen(QPen{QBrush{color}, 1});
         painter.drawLine(fromPoint, toPoint);
     }
     else
     {
-        painter.setPen(QPen{QBrush{color}, 1});
-
         auto leftSide = latLonToPoint((from.latitude + to.latitude) / 2, -180.0);
         auto rightSide = latLonToPoint((from.latitude + to.latitude) / 2, 180.0);
 
@@ -82,6 +77,10 @@ void DrawableMapWidget::connectTheDots(std::vector<tuple<int, int>> routes, QCol
         auto toAirport = airports[std::get<1>(route)];
 
         connectAirports(fromAirport, toAirport, color, painter);
+
+        painter.setPen(QPen{QBrush{QColor{255, 255, 255, 200}}, 3});
+        painter.drawPoint(airportToImg(fromAirport));
+        painter.drawPoint(airportToImg(toAirport));
     }
 
     for (auto route : routes)
@@ -108,12 +107,13 @@ void DrawableMapWidget::resetPic()
     map = map.scaled(1440, 720, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     painter.drawPixmap(0, 0, map);
 
+    /*
     painter.setPen(QPen{QBrush{QColor{0, 255, 0, 200}}, 3});
 
     for (auto airport : DbManager::getInstance().airports)
     {
         painter.drawPoint(airportToImg(airport));
-    }
+    }*/
 
     pic = l_pic;
 }
